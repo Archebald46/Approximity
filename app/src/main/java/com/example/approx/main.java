@@ -9,8 +9,11 @@ import android.os.Bundle;
 import android.app.Activity;
 
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -22,20 +25,25 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
     Button str;
     Button gt;
     Button cln;
-    Toast toast;
+    public static Toast toast;
     RadioButton rShake;
     RadioButton rDrop;
     MoveSense moveSense;
     RadioGroup rg;
     EditText dexter;
+    EditText strength;
+    public static ProgressBar progressB;
     int dexSTR;
+    int strSTR;
     int radiobtn;
     int i;
-    public static int action;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         str = (Button) findViewById(R.id.button_start);
         gt = (Button) findViewById(R.id.button_get);
@@ -44,12 +52,50 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
         rDrop = (RadioButton) findViewById(R.id.radioDrop);
         rg = (RadioGroup) findViewById(R.id.RG);
         dexter = (EditText) findViewById(R.id.dexterText);
+        strength = (EditText) findViewById(R.id.strText);
+        progressB = (ProgressBar) findViewById(R.id.progressBar);
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         str.setOnClickListener(this);
         gt.setOnClickListener(this);
         cln.setOnClickListener(this);
         rg.setOnCheckedChangeListener(this);
     }
+
+ public static void setActionInt (int first, int second){
+
+     if (first ==1 && second==1){
+           toast.setText("Тряска ОК! Действие: "+ first +" Стастус "+ second);
+           toast.show();
+
+     } else {
+         if (first == 1 && second == 0) {
+             toast.setText("Провалено! Действие: "+ first +" Статус: "+ second);
+             toast.show();
+             progressB.setProgress(0);
+         }
+     }
+
+     if (first ==2 && second==2){
+         toast.setText("Бросок ОК! Действие: "+ first +" Статус: "+ second);
+         toast.show();
+
+     } else {
+         if (first == 2 && second == 0) {
+             toast.setText("Провалено! Действие: "+ first +" Статус: "+ second);
+             toast.show();
+             progressB.setProgress(0);
+         }
+     }
+
+ }
+
+
+    /*public static void setProgressB (int prog) {
+        if (progressB.getProgress()<100){
+            progressB.incrementProgressBy(prog);}else{
+            progressB.setProgress(100);
+        }
+    }*/
 
 
     @Override
@@ -70,21 +116,22 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
         switch (v.getId()) {
             case R.id.button_start:
                 if (rShake.isChecked() || rDrop.isChecked()) {
-                    if (dexter.getText().toString().equals("")){
-                        toast.setText("Please,input dex");
+                    if (dexter.getText().toString().equals("")||strength.getText().toString().equals("")){
+                        toast.setText("Введи силу/ловкость от 1 до 100");
                         toast.show();
                         break;
                     } else{
                     dexSTR = Integer.parseInt(dexter.getText().toString());
-
+                    strSTR = Integer.parseInt(strength.getText().toString());
                     if (moveSense !=null){
                         moveSense.isUnregistred();}
-                    moveSense = new MoveSense(this, 12, radiobtn,dexSTR);
+                        progressB.setProgress(0);
+                    moveSense = new MoveSense(this, strSTR, radiobtn, dexSTR, progressB);
 
 
                      break;}
                 } else {
-                    toast.setText("RB isn't active!");
+                    toast.setText("Не выбрано действие");
                     toast.show();
                     break;
                 }
@@ -93,7 +140,7 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
             case R.id.button_get:
 
                 i = moveSense.getCount();
-                toast.setText("All: " + i);
+                toast.setText("Кол-во встрясок: " + i);
                 toast.show();
                 break;
 
@@ -102,6 +149,7 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
                 if (moveSense !=null){
                 moveSense.isUnregistred();}
                 radiobtn = 0;
+                progressB.setProgress(0);
                 break;
         }
 
@@ -114,15 +162,12 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
             case R.id.radioDrop:
                 if (moveSense !=null){
                 moveSense.isUnregistred();}
-
                 radiobtn = 2;
-
                 break;
 
             case R.id.radioShake:
                 if (moveSense !=null){
                 moveSense.isUnregistred();}
-
                 radiobtn = 1;
                 break;
 

@@ -3,71 +3,76 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#191970">
 
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Activation"
+        android:text="Старт"
         android:id="@+id/button_start"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/button_clean"
+        android:layout_toLeftOf="@+id/button_get"
+        android:layout_toStartOf="@+id/button_get"
+        android:background="#ffffff"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get count !"
+        android:text="Кол-во встрясок"
         android:id="@+id/button_get"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
         android:textStyle="bold"
-        android:layout_below="@id/button_start"/>
+        android:layout_alignTop="@+id/button_start"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Clean check!"
+        android:text="Сброс действия"
         android:id="@+id/button_clean"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
         android:textStyle="bold"
-        android:layout_below="@id/button_get"/>
+        android:layout_alignTop="@+id/button_start"
+
+        />
 
 
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/button_start"
-        android:layout_toRightOf="@id/button_start"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
         android:id="@+id/RG"
-
-       >
-
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Shake"
+            android:text="Тряска"
             android:id="@+id/radioShake"
-       />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:textColor="#ffffff"
+     />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Drop"
+            android:text="Бросок"
             android:id="@+id/radioDrop"
- />
+            android:layout_below="@id/radioShake"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:textColor="#ffffff"
 
-
-
-
-
-        </RadioGroup>
+    />
+    </RadioGroup>
 
     <EditText
         android:layout_width="wrap_content"
@@ -75,10 +80,36 @@
         android:inputType="numberSigned"
         android:ems="10"
         android:id="@+id/dexterText"
-        android:layout_marginLeft="64dp"
-        android:layout_marginStart="64dp"
+        android:maxLength="3"
+        android:hint="Введи ловкость"
+        android:textColor="#ffffff"
+        android:shadowColor="#000000"
+        android:textColorHint="#CDC9C9"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/strText"
+        android:layout_alignStart="@+id/strText" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberSigned"
+        android:ems="10"
+        android:id="@+id/strText"
+        android:maxLength="3"
+        android:hint="Введи силу"
+        android:textColor="#ffffff"
+        android:shadowColor="#000000"
+        android:textColorHint="#CDC9C9"
         android:layout_alignBottom="@+id/RG"
-        android:layout_toRightOf="@+id/RG"
-        android:layout_toEndOf="@+id/RG"
-        android:maxLength="3"/>
+        android:layout_toRightOf="@+id/button_clean"
+        android:layout_toEndOf="@+id/button_clean" />
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="46dp"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:max="100"/>
 </RelativeLayout>

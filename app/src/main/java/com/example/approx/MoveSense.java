@@ -7,7 +7,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 
-import android.widget.Toast;
+import android.widget.ProgressBar;
+
 
 
 public class MoveSense {
@@ -23,52 +24,41 @@ public class MoveSense {
     public float x, y, z;
     private int actionCode,dex;
     public static int act = 0;
-    int time;
+    int time,strnI, progress;
+    double strn;
+    ProgressBar PB;
+
     CountDownTimer countDownTimer;
-    public MoveSense(Context ctx,int str, int code, int dx){
+    public MoveSense(Context ctx,int str, int code, int dx, ProgressBar progressBar){
+        PB = progressBar;
         strong=str;
         dex = dx;
+        strn = 16 - ((strong -1)* 0.061);
+        strnI = (int) Math.round(strn);
         time = 2000 + 61*(dex - 1);
         actionCode=code;//1-тряска 2-бросок
         sensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
         sensorAccel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mAccel = 0.00f;
         context=ctx;
+        progress = (int) Math.round(100/(strnI+0.3));
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
         mAccelLast = SensorManager.GRAVITY_EARTH;
         sensorManager.registerListener(listener, sensorAccel, SensorManager.SENSOR_DELAY_UI);  // это,короче, слушатели и время опроса датчиков
-        countDownTimer = new CountDownTimer(time,1000) {
+        countDownTimer = new CountDownTimer(time,500) {
             @Override
             public void onTick(long millisUntilFinished) {
-                     getAct();
-                if (act ==1){
-                    main.action = act;
-                    mAccel=0;
-                    count=0;
-                    act = 0;
-                    isUnregistred();
-                    Toast.makeText(context,"Shake OK",Toast.LENGTH_SHORT).show();
-
-                }
-                if (act ==2){
-                    main.action = act;
-                    mAccel=0;
-                    count=0;
-                    act = 0;
-                    isUnregistred();
-                    Toast.makeText(context,"Drop OK",Toast.LENGTH_SHORT).show();
-
-                }
             }
             @Override
             public void onFinish() {
                 if (act == 0) {
-                    main.action = act;
                     mAccel=0;
                     count=0;
+                    main.setActionInt(actionCode,act);
+                    //main.setProgressB(0);
+                    PB.setProgress(0);
                     act = 0;
                     isUnregistred();
-                    Toast.makeText(context,"WASTED",Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -79,22 +69,26 @@ public class MoveSense {
         @Override
         public void onSensorChanged(SensorEvent event) {
             switch(actionCode){
-
-
                 case 1://тряска
                     z = event.values[2];
                     mAccelLast = mAccelCurrent;
                     mAccelCurrent=z;
                     float delta = mAccelCurrent - mAccelLast;
                     mAccel = mAccel * 0.9f + delta;
-                    if (mAccel >strong) {
+                    if (mAccel >12) { //вместо стронг стоит число 12, то есть сила конкретная
                         count++;
-
+                        //main.setProgressB(progress);
+                        if (PB.getProgress()<100){
+                            PB.incrementProgressBy(progress);}else{
+                            PB.setProgress(100);}
                     }
-                    if (count == 18) {
-
+                    if (count == strnI) {
                         act = 1;
-
+                        mAccel=0;
+                        count=0;
+                        main.setActionInt(actionCode,act);
+                        act = 0;
+                        isUnregistred();
                     }
                     break;
                 case 2://бросок
@@ -102,8 +96,13 @@ public class MoveSense {
                     y = event.values[1];
                     z = event.values[2];
                     sum=x+y+z;
-                    if (sum>strong*3||sum<-strong*3){
+                    if (sum>10*3||sum<-12*3){ //вместо стронг стоит число 12, то есть сила конкретная
                         act = 2;
+                        mAccel=0;
+                        count=0;
+                        main.setActionInt(actionCode,act);
+                        act = 0;
+                        isUnregistred();
                 }
                     break;
            }
@@ -129,10 +128,6 @@ public class MoveSense {
         return true;
     }
 
-    public static int getAct() {
-
-        return act;
-    }
 
     public static int getCount() {
 
