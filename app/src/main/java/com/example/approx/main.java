@@ -25,88 +25,89 @@ import android.widget.Toast;
 
 public class main extends Activity{
 
-        TextView tv;
-        SensorManager sensorManager;
-        Sensor sensorAccel;
-        Sensor sensorMagnet;
+    TextView tv;
+    SensorManager sensorManager;
+    Sensor sensorAccel;
+    Sensor sensorMagnet;
     Sensor sensorLinear;
-        private float mAccel;
-        private float mAccelCurrent;
-        private float mAccelLast;
-        public static int count = 0;
-        public static Toast toast;
-        int ch=0;
-
-        private long lastUpdate = -1;
-        public float x, y, zz,xx,yy;
+    private float mAccel;
+    private float mAccelCurrent;
+    private float mAccelLast, sum,sum1;
+    public static int count = 0;
+    public static Toast toast;
+    int ch=0;
 
 
-        StringBuilder sb = new StringBuilder();
-
-        Timer timer;
-
-        int rotation;
-
-        @Override
-        protected void onCreate (Bundle savedInstanceState){
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
-            tv = (TextView) findViewById(R.id.tv);
-            sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-            sensorAccel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            sensorMagnet = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-            sensorLinear = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-            mAccel = 0.00f;
-            mAccelCurrent = SensorManager.GRAVITY_EARTH;
-            mAccelLast = SensorManager.GRAVITY_EARTH;
-            toast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
+    private long lastUpdate = -1;
+    public float x, y, z , zz,xx,yy;
 
 
-        }
+    StringBuilder sb = new StringBuilder();
 
-        @Override
-        protected void onResume () {
-            super.onResume();
-            sensorManager.registerListener(listener, sensorAccel, SensorManager.SENSOR_DELAY_GAME);  // это,короче, слушатели и время опроса датчиков
-            sensorManager.registerListener(listener, sensorMagnet, SensorManager.SENSOR_DELAY_GAME);
-            sensorManager.registerListener(listener, sensorLinear, SensorManager.SENSOR_DELAY_GAME);
-            timer = new Timer();
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getDeviceOrientation();
-                            getActualDeviceOrientation();   // текущая позиция тела
-                            showInfo();
-                        }
-                    });
-                }
-            };
-            timer.schedule(task, 0, 50);
+    Timer timer;
 
-            WindowManager windowManager = ((WindowManager) getSystemService(Context.WINDOW_SERVICE));
-            Display display = windowManager.getDefaultDisplay();
-            rotation = display.getRotation();
+    int rotation;
 
-        }
+    @Override
+    protected void onCreate (Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        tv = (TextView) findViewById(R.id.tv);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorAccel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorMagnet = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        sensorLinear = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        mAccel = 0.00f;
+        mAccelCurrent = SensorManager.GRAVITY_EARTH;
+        mAccelLast = SensorManager.GRAVITY_EARTH;
+        toast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
 
-        @Override
-        protected void onPause () {
-            super.onPause();
-            sensorManager.unregisterListener(listener);
-            timer.cancel();
-        }
 
-        String format ( float values[]){
-            return String.format("%1$.1f\t\t%2$.1f\t\t%3$.1f", values[0], values[1], values[2]); // вывод на экран значений по осям
-        }
+    }
+
+    @Override
+    protected void onResume () {
+        super.onResume();
+        sensorManager.registerListener(listener, sensorAccel, SensorManager.SENSOR_DELAY_GAME);  // это,короче, слушатели и время опроса датчиков
+        sensorManager.registerListener(listener, sensorMagnet, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(listener, sensorLinear, SensorManager.SENSOR_DELAY_NORMAL);
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getDeviceOrientation();
+                        getActualDeviceOrientation();   // текущая позиция тела
+                        showInfo();
+                    }
+                });
+            }
+        };
+        timer.schedule(task, 0, 50);
+
+        WindowManager windowManager = ((WindowManager) getSystemService(Context.WINDOW_SERVICE));
+        Display display = windowManager.getDefaultDisplay();
+        rotation = display.getRotation();
+
+    }
+
+    @Override
+    protected void onPause () {
+        super.onPause();
+        sensorManager.unregisterListener(listener);
+        timer.cancel();
+    }
+
+    String format ( float values[]){
+        return String.format("%1$.1f\t\t%2$.1f\t\t%3$.1f", values[0], values[1], values[2]); // вывод на экран значений по осям
+    }
 
     void showInfo() {
         sb.setLength(0);
-        sb.append("Orientation : " + format(valuesResult))
-                .append("\nOrientation 2: " + format(valuesResult2)) // тоже к выводу
+        sb.append("Orientation 2 : " + format(valuesResult2))
+        // тоже к выводу
         ;
         tv.setText(sb);
     }
@@ -159,12 +160,15 @@ public class main extends Activity{
                         valuesAccel[i] = event.values[i];
                     }
 
-                    float z = event.values[2];
+                    x = event.values[0];
+                    y = event.values[1];
+                    z = event.values[2];
+
                     mAccelLast = mAccelCurrent;
                     mAccelCurrent = (float) Math.sqrt((double) (z * z));  // получаем координаты и силу тряски, если они 6 раз больше 12, то выводим тост
                     float delta = mAccelCurrent - mAccelLast;
                     mAccel = mAccel * 0.9f + delta;
-                    if (mAccel >20) {
+                    if (mAccel >12) {
                         count++;
                     }
                     if (count == 6) {
@@ -172,63 +176,54 @@ public class main extends Activity{
                         toast.setText("Мутит,поц");
                         toast.show();
                         count = 0;
-                    }
-                  /*  xx = event.values[0];
-                    yy = event.values[1];
-
-                    zz = event.values[2];
-
-
-                    if(zz<2&&zz>-2&&yy<2&&yy>-2&&xx<-5&&ch==0){
-                        Log.d("sensor", "L: " + xx + yy);
-                        toast.setText("Лин. Лево");
-                        toast.show();
-                        xx = 0;
-                        yy = 0;
-                        ch=1;
                         break;
                     }
-                    else if(zz<2&&zz>-2&&yy<2&&yy>-2&&xx>5&&ch==0){
-                        Log.d("sensor", "R: " + xx + yy);
-                        toast.setText("Лин. Право");
+
+
+
+
+                    if(x>-1&&x<1&&y>-1&&y<1&&z>-11&&z<-10) { // вертикальная ориентация
+                        toast.setText("На пузе");
                         toast.show();
-                        xx = 0;
-                        yy = 0;
-                        ch=1;
                         break;
-                    }*/
-break;
-
-
-                case Sensor.TYPE_LINEAR_ACCELERATION:
-                    for (int i = 0; i < 3; i++) {
-                        valuesAccel[i] = event.values[i];
                     }
+
+
+
+
+
+                    if(x>-2&&x<0&&y>8&&y<9&&z>1&&z<2) { // дисплеем вниз
+                        toast.setText("Вертикаль");
+                        toast.show();
+                        break;
+                    }
+
+
                     long curTime = System.currentTimeMillis(); // эта неведомая хрень с резким броском влево или право
-                    if ((curTime - lastUpdate) > 100) {
+                    if ((curTime - lastUpdate) > 1) {
                         lastUpdate = curTime;
-                        ch=0;
-                        x = event.values[0];
-                        y = event.values[1];
+                        xx = event.values[0];
+                        yy = event.values[1];
+                        zz = event.values[2];
+                        sum = 0;
+                        sum1 = 0;
+                        sum1 = xx+yy+zz;
 
-
-
-                        if(x<-3&&y>2&&ch==0){
-                            Log.d("sensor", "L: " + x + y);
+                        if(((sum1<-18&&sum1>-40))&&(xx>-45&&xx<-18)&&((zz<-2)&&(zz>-8))&&(yy<-1)){
+                            // бросок ВЛЕВО
+                            //Log.d("sensor", "L: " + x + y);
                             toast.setText("Влево");
                             toast.show();
-                            x = 0;
-                            y = 0;
-                            ch=1;
+                            Log.d("sensor", "L: " + xx +" " + yy+ " " + zz);
                             break;
                         }
-                        else if(x<-4&&y<-4&&ch==0){
-                            Log.d("sensor", "R: " + x + y);
+
+
+                        if((sum1>21)&&xx>10&&xx<26&&zz>0&&y>-10){   // бросок ВПРАВО
+                            // Log.d("sensor", "R: " + x + y);
                             toast.setText("Вправо");
                             toast.show();
-                            x = 0;
-                            y = 0;
-                            ch=1;
+                            Log.d("sensor", "L: " + xx +" " + yy+ " " + zz);
                             break;
                         }
 
@@ -237,7 +232,7 @@ break;
 
 
 
-                    break;
+
                 case Sensor.TYPE_MAGNETIC_FIELD:         // магнитный, его я не юзаю
                     for (int i = 0; i < 3; i++) {
                         valuesMagnet[i] = event.values[i];
