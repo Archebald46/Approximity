@@ -29,7 +29,7 @@ import android.widget.ProgressBar;
         PB = progressBar;
         strong=str;
         dex = dx;
-        strn = 16 - ((strong -1)* 0.162); // вычисление количества встрясок, зависящего от силы персонажа
+        strn = 16 - ((strong -1)* 0.122); // вычисление количества встрясок, зависящего от силы персонажа
         strnI = (int) Math.round(strn); // округление до целого
         time = 2000 + 61*(dex - 1); // вычисление времени,отведенного на выполнение жесты, в зависимости от ловкости персонажа
         actionCode=code;//1-тряска 2-бросок
@@ -39,7 +39,7 @@ import android.widget.ProgressBar;
 
         mAccel = 0.00f;
         context=ctx;
-        progress = (int) Math.round(100/(strnI+0.3));
+        progress = (int) Math.round((100/(strnI))+0.7); // дельта для заполнения прогреммбара
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
         mAccelLast = SensorManager.GRAVITY_EARTH;
         sensorManager.registerListener(listener, sensorAccel, SensorManager.SENSOR_DELAY_UI);  // это,короче, слушатели и время опроса акселерометра
@@ -73,7 +73,7 @@ import android.widget.ProgressBar;
                     mAccelCurrent=z;
                     float delta = mAccelCurrent - mAccelLast;  // суть всего: расчет разницы между начальным ускороение и конечным по оси Z при тряске
                     mAccel = mAccel * 0.9f + delta;
-                    if (mAccel >8) { //вместо стронг стоит число 8, то есть сила конкретная; если разница > 8, то срабатывает счетчик
+                    if (mAccel >10) { //вместо стронг стоит число 10, то есть сила конкретная; если разница > 10, то срабатывает счетчик
                         count++; // отсчитывает требуемое количество встрясок
                         //main.setProgressB(progress);
 
