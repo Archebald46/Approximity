@@ -76,7 +76,7 @@ public class MoveSense {
                     y = event.values[1];
                     z = event.values[2];
                     sum=x+y+z;
-                    if (sum>40||sum<-40){
+                    if (sum>strong*3||sum<-strong*3){
                     Log.e(Float.toString(x) + " " +Float.toString(y) + " " +Float.toString(z) + " ", "БРОСОК");
                         Toast.makeText(context,"БРОСОК",Toast.LENGTH_SHORT).show();
                 }
