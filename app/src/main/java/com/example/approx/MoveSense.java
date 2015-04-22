@@ -6,7 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.CountDownTimer;
-import android.util.Log;
+
 import android.widget.Toast;
 
 
@@ -18,13 +18,17 @@ public class MoveSense {
     private float mAccelLast,sum;
     private Context context;
     public static int count = 0;
-    int a=0;
+
     private int strong;
     public float x, y, z;
-    private int actionCode;
+    private int actionCode,dex;
+    public static int act = 0;
+    int time;
     CountDownTimer countDownTimer;
-    public MoveSense(Context ctx,int str, int code){
+    public MoveSense(Context ctx,int str, int code, int dx){
         strong=str;
+        dex = dx;
+        time = 2000 + 61*(dex - 1);
         actionCode=code;//1-тряска 2-бросок
         sensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
         sensorAccel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -33,18 +37,40 @@ public class MoveSense {
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
         mAccelLast = SensorManager.GRAVITY_EARTH;
         sensorManager.registerListener(listener, sensorAccel, SensorManager.SENSOR_DELAY_UI);  // это,короче, слушатели и время опроса датчиков
-        countDownTimer = new CountDownTimer(6000,1000) {
+        countDownTimer = new CountDownTimer(time,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
+                     getAct();
+                if (act ==1){
+                    main.action = act;
+                    mAccel=0;
+                    count=0;
+                    act = 0;
+                    isUnregistred();
+                    Toast.makeText(context,"Shake OK",Toast.LENGTH_SHORT).show();
 
+                }
+                if (act ==2){
+                    main.action = act;
+                    mAccel=0;
+                    count=0;
+                    act = 0;
+                    isUnregistred();
+                    Toast.makeText(context,"Drop OK",Toast.LENGTH_SHORT).show();
+
+                }
             }
             @Override
             public void onFinish() {
-                if (actionCode==1){
-                mAccel=0;
-                count=0;
+                if (act == 0) {
+                    main.action = act;
+                    mAccel=0;
+                    count=0;
+                    act = 0;
+                    isUnregistred();
+                    Toast.makeText(context,"WASTED",Toast.LENGTH_SHORT).show();
                 }
-                countDownTimer.start();
+
             }
         };
         countDownTimer.start();
@@ -53,6 +79,8 @@ public class MoveSense {
         @Override
         public void onSensorChanged(SensorEvent event) {
             switch(actionCode){
+
+
                 case 1://тряска
                     z = event.values[2];
                     mAccelLast = mAccelCurrent;
@@ -61,14 +89,12 @@ public class MoveSense {
                     mAccel = mAccel * 0.9f + delta;
                     if (mAccel >strong) {
                         count++;
-                        Log.e("",Float.toString(count));
+
                     }
                     if (count == 18) {
-                        a++;
-                        Log.e(Float.toString(a) + " " +Float.toString(mAccel) + " ", "МУТИТ");
-                        Toast.makeText(context,"АЖТРЯСЕТ",Toast.LENGTH_SHORT).show();
-                        mAccel=0.0f;
-                        count = 0;
+
+                        act = 1;
+
                     }
                     break;
                 case 2://бросок
@@ -77,8 +103,7 @@ public class MoveSense {
                     z = event.values[2];
                     sum=x+y+z;
                     if (sum>strong*3||sum<-strong*3){
-                    Log.e(Float.toString(x) + " " +Float.toString(y) + " " +Float.toString(z) + " ", "БРОСОК");
-                        Toast.makeText(context,"БРОСОК",Toast.LENGTH_SHORT).show();
+                        act = 2;
                 }
                     break;
            }
@@ -90,12 +115,28 @@ public class MoveSense {
         }
     };
 
+
+
     public boolean isUnregistred(){
-        sensorManager.unregisterListener(listener);
-        sensorManager=null;
-        sensorAccel=null;
+        if (sensorManager != null){
+        sensorManager.unregisterListener(listener);}
+        if (sensorAccel !=null){
+        sensorAccel=null;}
+        if (countDownTimer !=null){
         countDownTimer.cancel();
-        countDownTimer = null;
+        countDownTimer = null;}
+        count = 0;
         return true;
     }
+
+    public static int getAct() {
+
+        return act;
+    }
+
+    public static int getCount() {
+
+        return count;
+    }
+
 }
