@@ -1,6 +1,7 @@
 package com.example.approx;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 
@@ -26,6 +27,7 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
     Button str;
     Button gt;
     Button cln;
+    Button bl;
     public static Toast toast;
     RadioButton rShake;
     RadioButton rDrop;
@@ -52,6 +54,7 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
         str = (Button) findViewById(R.id.button_start);
         gt = (Button) findViewById(R.id.button_get);
         cln = (Button) findViewById(R.id.button_clean);
+        bl = (Button) findViewById(R.id.button_ball);
         rShake = (RadioButton) findViewById(R.id.radioShake);     //регистрация используемых компонентов (кнопок и прочего)
         rDrop = (RadioButton) findViewById(R.id.radioDrop);
         rg = (RadioGroup) findViewById(R.id.RG);
@@ -63,7 +66,7 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
         str.setOnClickListener(this); // установка слушателя на кнопки для обработки нажатий на них
         gt.setOnClickListener(this);
         cln.setOnClickListener(this);
-
+        bl.setOnClickListener(this);
         rg.setOnCheckedChangeListener(this); // слушатель для радиогруппы, в которой лежат радиобатоны
     }
 
@@ -153,6 +156,11 @@ public class main extends Activity implements View.OnClickListener, OnCheckedCha
                 moveSense.isUnregistred();} // сбрасывает выбор радиобатонов, обнуляет прогрессбар
                 radiobtn = 0;
                 progressB.setProgress(0);
+                break;
+
+            case R.id.button_ball: //кнопка Clean
+                Intent intent = new Intent(getApplicationContext(), MoveObject.class);
+                startActivity(intent);
                 break;
         }
 

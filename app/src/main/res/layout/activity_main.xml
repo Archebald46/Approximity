@@ -18,6 +18,19 @@
         android:layout_toLeftOf="@+id/button_get"
         android:layout_toStartOf="@+id/button_get"
         android:background="#ffffff"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Шар"
+        android:id="@+id/button_ball"
+        android:textStyle="bold"
+        android:layout_centerVertical="true"
+        android:layout_below="@id/button_start"
+        android:layout_toRightOf="@+id/button_clean"
+        android:layout_toLeftOf="@+id/button_get"
+        android:layout_toStartOf="@+id/button_get"
+        android:background="#ffffff"
+        android:layout_marginTop="3dp"/>
 
     <Button
         android:layout_width="wrap_content"
