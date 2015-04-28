@@ -5,22 +5,28 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 public class MoveObject extends Activity {
     private SimulationView mView;
     private SensorManager mSensorManager;
     private WindowManager mWindowManager;
     private Display mDisplay;
+    public static Bitmap b;
+    public static Canvas c;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,7 +36,41 @@ public class MoveObject extends Activity {
         mDisplay = mWindowManager.getDefaultDisplay();
         mView = new SimulationView(this);
         setContentView(mView);
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int height = displaymetrics.heightPixels;
+        int width = displaymetrics.widthPixels;
+        b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        int[] srcPixels = new int[width* height];
+        c = new Canvas(b);
+        b.getPixels(srcPixels, 0, width, 0, 0, width, height);
+        b.setPixel(100, 101, Color.BLACK);
+        b.setPixel(101,101,Color.BLACK);
+        b.setPixel(101,102,Color.BLACK);
+        b.setPixel(103,102,Color.BLACK);
+        b.setPixel(104,102,Color.BLACK);
+        b.setPixel(100,100,Color.BLACK);
+       mView.draw(c);
+        Log.d("Coord", " fdf"+ srcPixels );
+
     }
+    /*public static Bitmap loadBitmapFromView(View v) {
+        if (v.getMeasuredHeight() <= 0) {
+            v.measure(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            Bitmap b = Bitmap.createBitmap(v.getMeasuredWidth(), v.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+            v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+            int[] srcPixels = new int[b.getWidth()* b.getHeight()];
+            b.getPixels(srcPixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
+            Log.d("Coord", " fdf"+ srcPixels );
+            return b;
+        } else{
+        Bitmap b = Bitmap.createBitmap( v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+        int[] srcPixels = new int[b.getWidth()* b.getHeight()];
+        b.getPixels(srcPixels, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
+            Log.d("Coord", " fdf"+ srcPixels );
+        return b;}
+    }*/
 
     @Override
     protected void onResume() {
@@ -43,6 +83,7 @@ public class MoveObject extends Activity {
         super.onPause();
         mView.stopSimulation();
     }
+
 
     class SimulationView extends View implements SensorEventListener {
 
@@ -124,6 +165,7 @@ public class MoveObject extends Activity {
             private Particle mBalls[] = new Particle[NUM_PARTICLES];
             ParticleSystem() {
                 mBalls[0] = new Particle();
+
             }
 
 
@@ -186,6 +228,7 @@ public class MoveObject extends Activity {
 
         public void startSimulation() {
             mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+
         }
 
         public void stopSimulation() {
@@ -208,6 +251,7 @@ public class MoveObject extends Activity {
             final int dstWidth = (int) (sBallDiameter * mMetersToPixelsX + 0.5f);
             final int dstHeight = (int) (sBallDiameter * mMetersToPixelsY + 0.5f);
             mBitmap = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
+
         }
 
         @Override
@@ -218,6 +262,8 @@ public class MoveObject extends Activity {
             mHorizontalBound = ((w / mMetersToPixelsX - sBallDiameter) * 0.5f);
             mVerticalBound = ((h / mMetersToPixelsY - sBallDiameter) * 0.5f);
         }
+
+
 
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
@@ -276,6 +322,7 @@ public class MoveObject extends Activity {
                 final float x = xc + particleSystem.mBalls[0].mPosX * xs;
                 final float y = yc - particleSystem.mBalls[0].mPosY * ys;
                 canvas.drawBitmap(bitmap, x, y, null);
+
             }
 
             // and make sure to redraw asap
